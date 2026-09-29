@@ -219,7 +219,7 @@
                         <img src="{{ $img['url'] }}" alt="{{ $img['title'] }}">
                         <div class="position-absolute bottom-0 start-0 end-0 p-1 text-white text-center small text-truncate"
                              style="background: rgba(0,0,0,0.7); font-size: 0.68rem;">
-                            {{ $img['category'] === 'Góc chụp phòng ngủ' ? 'Phòng ngủ' : ($img['category'] === 'Phòng tắm' ? 'Phòng tắm' : 'Tiện ích') }}
+                            {{ Str::limit($img['title'], 25) }}
                         </div>
                     </div>
                 @endforeach
