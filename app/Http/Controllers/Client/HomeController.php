@@ -182,10 +182,10 @@ class HomeController extends Controller
                     'desc'     => 'Đầu giường bọc nhung cao cấp, hệ thống công tắc thông minh 1 chạm ngay đầu giường.'
                 ],
                 [
-                    'url'      => 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1400',
-                    'title'    => 'Góc đọc sách & Bàn trà ngắm phố',
+                    'url'      => 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=1400',
+                    'title'    => 'Góc đọc sách & bàn trà',
                     'category' => 'Góc chụp phòng ngủ',
-                    'desc'     => 'Ghế bành thư giãn êm ái bên cửa sổ lớn, nơi lý tưởng để đọc sách hoặc thưởng thức tách cà phê.'
+                    'desc'     => 'Ghế bành thư giãn êm ái bên cửa sổ lớn, bàn trà gỗ tròn lý tưởng để đọc sách hoặc thưởng thức tách trà chiều.'
                 ],
                 [
                     'url'      => 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1400',
