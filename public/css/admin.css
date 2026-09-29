@@ -1,0 +1,253 @@
+﻿/* ============================================================
+   ADMIN CSS – Radiant Hotel Management
+   ============================================================ */
+
+:root {
+    --sidebar-width: 250px;
+    --color-available:   #27ae60;
+    --color-booked:      #f39c12;
+    --color-occupied:    #e74c3c;
+    --color-maintenance: #95a5a6;
+    --color-cleaning:    #8e44ad;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f0f2f5;
+    overflow-x: hidden;
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-link {
+    color: rgba(255,255,255,0.7) !important;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 2px 0;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+    color: white !important;
+    background: rgba(255,255,255,0.12);
+}
+
+.sidebar-link.active {
+    background: rgba(41,128,185,0.4);
+    font-weight: 600;
+}
+
+/* Nội dung đẩy sang phải */
+.flex-grow-1 {
+    margin-left: var(--sidebar-width);
+}
+
+@media (max-width: 991px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    .flex-grow-1 {
+        margin-left: 0;
+    }
+}
+
+/* --- SƠ ĐỒ PHÒNG (ROOM GRID) --- */
+.floor-section {
+    margin-bottom: 28px;
+}
+
+.floor-label {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+}
+
+.room-cell {
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    border: 2px solid transparent;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.room-cell:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.room-cell .room-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.room-cell .room-type-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    margin-top: 4px;
+    opacity: 0.85;
+}
+
+.room-cell .room-status-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.35);
+}
+
+/* Trạng thái màu */
+.room-cell.status-available {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    border-color: #219a52;
+}
+
+.room-cell.status-booked {
+    background: linear-gradient(135deg, #e67e22, #f39c12);
+    color: white;
+    border-color: #d35400;
+}
+
+.room-cell.status-occupied {
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    color: white;
+    border-color: #a93226;
+}
+
+.room-cell.status-maintenance {
+    background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+    color: white;
+    border-color: #6c7a7b;
+}
+
+.room-cell.status-cleaning {
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+    color: white;
+    border-color: #7d3c98;
+}
+
+/* --- CHÚ THÍCH TRẠNG THÁI --- */
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 18px;
+    font-size: 0.85rem;
+}
+
+.legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.legend-dot.available   { background: var(--color-available); }
+.legend-dot.booked      { background: var(--color-booked); }
+.legend-dot.occupied    { background: var(--color-occupied); }
+.legend-dot.maintenance { background: var(--color-maintenance); }
+.legend-dot.cleaning    { background: var(--color-cleaning); }
+
+/* --- THỐNG KÊ CARDS --- */
+.stat-card {
+    border: none;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stat-card .stat-label {
+    font-size: 0.82rem;
+    color: #888;
+    font-weight: 500;
+}
+
+/* --- MODAL --- */
+.modal-room-info .modal-header {
+    border-radius: 14px 14px 0 0;
+}
+
+.modal-room-info .modal-content {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row .label {
+    color: #888;
+    font-weight: 500;
+}
+
+.info-row .value {
+    font-weight: 600;
+    color: #333;
+}
+
+/* --- NÚT THAO TÁC NHANH --- */
+.btn-status {
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-status:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
