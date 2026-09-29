@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Hoá đơn ' . $invoice->invoice_number . ' – Radiant Hotel')
 
 @push('styles')
@@ -109,10 +109,10 @@
             </table>
         </div>
 
-        {{-- Trạng thái thanh toán --}}
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="p-3 rounded-3 {{ $invoice->status === 'paid' ? 'bg-success bg-opacity-10' : 'bg-warning bg-opacity-10' }}">
+        {{-- Trạng thái thanh toán & Mã VietQR chuyển khoản --}}
+        <div class="row mt-4 align-items-center">
+            <div class="col-md-8">
+                <div class="p-3 rounded-3 mb-3 {{ $invoice->status === 'paid' ? 'bg-success bg-opacity-10' : 'bg-warning bg-opacity-10' }}">
                     @php
                         $invLabels = ['draft' => 'Chờ thanh toán', 'paid' => 'Đã thanh toán', 'cancelled' => 'Đã huỷ'];
                         $invIcons  = ['draft' => 'hourglass-split', 'paid' => 'check-circle-fill', 'cancelled' => 'x-circle-fill'];
@@ -120,10 +120,18 @@
                     <i class="bi bi-{{ $invIcons[$invoice->status] ?? 'question-circle' }} me-2 {{ $invoice->status === 'paid' ? 'text-success' : 'text-warning' }}"></i>
                     <strong>Trạng thái:</strong> {{ $invLabels[$invoice->status] ?? $invoice->status }}
                 </div>
+                <div class="small text-muted">
+                    <p class="mb-1"><strong>Phương thức thanh toán:</strong> Tiền mặt hoặc Chuyển khoản VietQR (Napas 247 24/7).</p>
+                    <p class="mb-1"><strong>Ngân hàng:</strong> {{ $bankDetails['bank_name'] }} &nbsp;|&nbsp; <strong>Số TK:</strong> <span class="fw-bold text-primary">{{ $bankDetails['account_no'] }}</span></p>
+                    <p class="mb-1"><strong>Chủ tài khoản:</strong> {{ $bankDetails['account_name'] }}</p>
+                    <p class="mb-0"><strong>Nội dung chuyển khoản:</strong> <span class="badge bg-light text-dark border">RADIANT HD{{ $invoice->id }}</span></p>
+                </div>
             </div>
-            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                <p class="text-muted small mb-0">Cảm ơn quý khách đã sử dụng dịch vụ của Radiant Hotel.</p>
-                <p class="text-muted small mb-0">Hẹn gặp lại!</p>
+            <div class="col-md-4 text-md-end text-center mt-3 mt-md-0">
+                <div class="d-inline-block p-2 border rounded-3 bg-white shadow-sm text-center">
+                    <img src="{{ $vietQrUrl }}" alt="VietQR Invoice" style="max-width: 180px; height: auto;" class="rounded">
+                    <small class="d-block text-muted mt-1 fw-semibold" style="font-size: 0.72rem;">Quét VietQR thanh toán</small>
+                </div>
             </div>
         </div>
     </div>

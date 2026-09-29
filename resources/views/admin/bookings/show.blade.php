@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Đặt phòng #' . $booking->id . ' – Radiant Hotel')
 
 @section('content')
@@ -259,12 +259,113 @@
                     <span class="fw-semibold">{{ number_format($tax, 0, ',', '.') }}đ</span>
                 </div>
                 <hr>
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between mb-3">
                     <span class="fw-bold fs-5">Tổng cộng</span>
                     <span class="fw-bold fs-5 text-primary">{{ number_format($grandTotal, 0, ',', '.') }}đ</span>
                 </div>
             </div>
         </div>
+
+        {{-- THẺ THANH TOÁN VIETQR & ĐỐI SOÁT DÀNH CHO LỄ TÂN --}}
+        <div class="card border-0 shadow-sm rounded-3 mt-4" style="border-top: 4px solid #2980b9 !important;">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="bi bi-qr-code-scan me-1"></i>Thanh toán VietQR
+                    </h6>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success small">Napas 247</span>
+                </div>
+            </div>
+            <div class="card-body p-4 text-center">
+                <div class="p-2 border rounded-3 bg-light d-inline-block mb-3">
+                    <img src="{{ $depositQrUrl }}" alt="Mã VietQR" class="rounded" style="max-width: 170px; height: auto;">
+                </div>
+                <div class="small text-muted mb-3">
+                    STK: <strong class="text-primary">{{ $bankDetails['account_no'] }}</strong> ({{ $bankDetails['bank_name'] }})<br>
+                    Cú pháp: <span class="badge bg-light text-dark border">RADIANT DP{{ $booking->id }} {{ substr(preg_replace('/[^0-9]/', '', $booking->guest_phone ?? ''), -4) }}</span>
+                </div>
+
+                {{-- Nút xem QR to / gửi khách --}}
+                <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-3" data-bs-toggle="modal" data-bs-target="#adminQrModal">
+                    <i class="bi bi-arrows-fullscreen me-1"></i>Mở mã QR to cho khách quét
+                </button>
+
+                <hr class="my-3">
+
+                {{-- Cập nhật trạng thái thanh toán nhanh --}}
+                <label class="form-label small fw-semibold text-muted d-block text-start">Cập nhật trạng thái thanh toán:</label>
+                <form method="POST" action="{{ route('admin.bookings.update-payment', $booking) }}">
+                    @csrf @method('PATCH')
+                    <div class="input-group input-group-sm mb-2">
+                        <select name="payment_status" class="form-select">
+                            <option value="unpaid" {{ $booking->payment_status === 'unpaid' ? 'selected' : '' }}>Chưa thanh toán</option>
+                            <option value="partial" {{ $booking->payment_status === 'partial' ? 'selected' : '' }}>Đã đặt cọc 50%</option>
+                            <option value="paid" {{ $booking->payment_status === 'paid' ? 'selected' : '' }}>Đã thanh toán đủ</option>
+                        </select>
+                        <button class="btn btn-primary" type="submit">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+
+{{-- MODAL XEM MÃ VIETQR TO TRONG ADMIN --}}
+<div class="modal fade" id="adminQrModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom py-3">
+                <h6 class="modal-title fw-bold text-primary">
+                    <i class="bi bi-qr-code-scan me-2"></i>Mã thanh toán VietQR – Đặt phòng #{{ $booking->id }}
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div class="btn-group w-100 mb-3" role="group">
+                    <button type="button" class="btn btn-outline-primary active btn-sm" id="adminBtnDep" onclick="toggleAdminQr('deposit')">
+                        Cọc 50% ({{ number_format($depositAmount, 0, ',', '.') }}đ)
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="adminBtnFull" onclick="toggleAdminQr('full')">
+                        100% ({{ number_format($booking->total_price, 0, ',', '.') }}đ)
+                    </button>
+                </div>
+                <div class="p-3 border rounded-3 bg-white shadow-sm d-inline-block mb-3">
+                    <img id="adminQrImg" src="{{ $depositQrUrl }}" alt="VietQR Đặt phòng" style="max-width: 250px; width: 100%; height: auto;">
+                </div>
+                <div class="text-start bg-light p-3 rounded-3 small">
+                    <div class="mb-1"><strong>Ngân hàng:</strong> {{ $bankDetails['bank_name'] }}</div>
+                    <div class="mb-1"><strong>Số tài khoản:</strong> <span class="fw-bold text-primary">{{ $bankDetails['account_no'] }}</span></div>
+                    <div class="mb-1"><strong>Tên thụ hưởng:</strong> {{ $bankDetails['account_name'] }}</div>
+                    <div><strong>Nội dung CK:</strong> <span class="badge bg-white text-dark border">RADIANT DP{{ $booking->id }} {{ substr(preg_replace('/[^0-9]/', '', $booking->guest_phone ?? ''), -4) }}</span></div>
+                </div>
+            </div>
+            <div class="modal-footer border-top py-2">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    const qrDep = @json($depositQrUrl);
+    const qrFull = @json($fullQrUrl);
+
+    function toggleAdminQr(type) {
+        const btnDep = document.getElementById('adminBtnDep');
+        const btnFull = document.getElementById('adminBtnFull');
+        const img = document.getElementById('adminQrImg');
+
+        if (type === 'deposit') {
+            btnDep.classList.add('active');
+            btnFull.classList.remove('active');
+            img.src = qrDep;
+        } else {
+            btnFull.classList.add('active');
+            btnDep.classList.remove('active');
+            img.src = qrFull;
+        }
+    }
+</script>
+@endpush
 @endsection

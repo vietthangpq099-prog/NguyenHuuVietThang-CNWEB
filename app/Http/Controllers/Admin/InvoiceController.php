@@ -44,7 +44,10 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         $invoice->load(['booking.room.roomType', 'booking.services', 'items']);
-        return view('admin.invoices.show', compact('invoice'));
+        $vietQrUrl   = \App\Services\VietQrService::generateInvoiceQrUrl($invoice);
+        $bankDetails = \App\Services\VietQrService::getBankDetails();
+
+        return view('admin.invoices.show', compact('invoice', 'vietQrUrl', 'bankDetails'));
     }
 
     /**

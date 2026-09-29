@@ -116,7 +116,26 @@ class BookingController extends Controller
         $booking->load(['room.roomType', 'services', 'invoice.items', 'user']);
         $allServices = Service::where('is_active', true)->orderBy('name')->get();
 
-        return view('admin.bookings.show', compact('booking', 'allServices'));
+        $fullQrUrl     = \App\Services\VietQrService::generateBookingQrUrl($booking, $booking->total_price);
+        $depositAmount = round($booking->total_price * 0.5);
+        $depositQrUrl  = \App\Services\VietQrService::generateBookingQrUrl($booking, $depositAmount);
+        $bankDetails   = \App\Services\VietQrService::getBankDetails();
+
+        return view('admin.bookings.show', compact('booking', 'allServices', 'fullQrUrl', 'depositQrUrl', 'depositAmount', 'bankDetails'));
+    }
+
+    /**
+     * Cập nhật trạng thái thanh toán (unpaid, partial, paid).
+     */
+    public function updatePayment(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'payment_status' => 'required|in:unpaid,partial,paid',
+        ]);
+
+        $booking->update(['payment_status' => $validated['payment_status']]);
+
+        return back()->with('success', "Đã cập nhật trạng thái thanh toán đặt phòng #{$booking->id} sang {$booking->payment_status_label}.");
     }
 
     /**

@@ -91,6 +91,18 @@ class BookingController extends Controller
     public function confirmation(Booking $booking)
     {
         $booking->load('room.roomType');
-        return view('client.booking.confirmation', compact('booking'));
+
+        $depositAmount = round($booking->total_price * 0.5);
+        $fullQrUrl     = \App\Services\VietQrService::generateBookingQrUrl($booking, $booking->total_price);
+        $depositQrUrl  = \App\Services\VietQrService::generateBookingQrUrl($booking, $depositAmount);
+        $bankDetails   = \App\Services\VietQrService::getBankDetails();
+
+        return view('client.booking.confirmation', compact(
+            'booking',
+            'fullQrUrl',
+            'depositQrUrl',
+            'depositAmount',
+            'bankDetails'
+        ));
     }
 }

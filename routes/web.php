@@ -69,6 +69,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,receptionist'])->name('a
     Route::patch('/bookings/{booking}/checkin', [AdminBookingController::class, 'checkin'])->name('bookings.checkin');
     Route::patch('/bookings/{booking}/checkout', [AdminBookingController::class, 'checkout'])->name('bookings.checkout');
     Route::patch('/bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::patch('/bookings/{booking}/payment', [AdminBookingController::class, 'updatePayment'])->name('bookings.update-payment');
 
     // Gắn / huỷ dịch vụ phụ cho khách đang ở
     Route::post('/bookings/{booking}/services', [AdminBookingController::class, 'addService'])->name('bookings.add-service');
