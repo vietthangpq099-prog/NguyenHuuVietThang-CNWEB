@@ -156,7 +156,7 @@ class HomeController extends Controller
                     'desc'     => 'Nệm lò xo túi êm ái đàn hồi cao, ga gối cotton Ai Cập kháng khuẩn đem lại giấc ngủ sâu tuyệt đối.'
                 ],
                 [
-                    'url'      => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1400',
+                    'url'      => 'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1400',
                     'title'    => 'Góc sofa thư giãn & Bàn làm việc',
                     'category' => 'Góc chụp phòng ngủ',
                     'desc'     => 'Khu vực làm việc tiện nghi với ghế công thái học, đèn bàn bảo vệ mắt và bàn trà tiếp khách.'
@@ -182,7 +182,7 @@ class HomeController extends Controller
                     'desc'     => 'Đầu giường bọc nhung cao cấp, hệ thống công tắc thông minh 1 chạm ngay đầu giường.'
                 ],
                 [
-                    'url'      => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1400',
+                    'url'      => 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1400',
                     'title'    => 'Góc đọc sách & Bàn trà ngắm phố',
                     'category' => 'Góc chụp phòng ngủ',
                     'desc'     => 'Ghế bành thư giãn êm ái bên cửa sổ lớn, nơi lý tưởng để đọc sách hoặc thưởng thức tách cà phê.'
@@ -196,7 +196,7 @@ class HomeController extends Controller
             ],
             'Deluxe' => [
                 [
-                    'url'      => $room->image ?? 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1400',
+                    'url'      => $room->image ?? 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1400',
                     'title'    => 'Toàn cảnh phòng Deluxe view kính tràn viền',
                     'category' => 'Góc chụp phòng ngủ',
                     'desc'     => 'Không gian mở 40m² với hệ thống kính tràn viền từ trần xuống sàn đón trọn cảnh đẹp thành phố.'
@@ -234,7 +234,7 @@ class HomeController extends Controller
                     'desc'     => 'Phòng khách tách biệt với sofa da thật, bàn làm việc giám đốc và máy pha cafe Nespresso.'
                 ],
                 [
-                    'url'      => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1400',
+                    'url'      => 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400',
                     'title'    => 'Khu vực bàn ăn & Quầy Minibar rượu vang',
                     'category' => 'Góc chụp phòng ngủ',
                     'desc'     => 'Bàn ăn gia đình 4 chỗ và tủ bảo quản rượu vang sang trọng sẵn sàng phục vụ.'
