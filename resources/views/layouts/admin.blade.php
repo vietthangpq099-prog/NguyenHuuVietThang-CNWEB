@@ -38,6 +38,10 @@
                    href="{{ route('admin.rooms.index') }}">
                     <i class="bi bi-door-open me-2"></i>Quản lý phòng
                 </a>
+                <a class="nav-link sidebar-link {{ request()->routeIs('admin.students*') ? 'active' : '' }}"
+                   href="{{ route('admin.students.index') }}">
+                    <i class="bi bi-mortarboard me-2"></i>Quản lý Sinh viên
+                </a>
                 <a class="nav-link sidebar-link {{ request()->routeIs('admin.room-types*') ? 'active' : '' }}"
                    href="{{ route('admin.room-types.index') }}">
                     <i class="bi bi-tags me-2"></i>Hạng / Loại phòng
@@ -49,10 +53,6 @@
                 <a class="nav-link sidebar-link {{ request()->routeIs('admin.invoices*') ? 'active' : '' }}"
                    href="{{ route('admin.invoices.index') }}">
                     <i class="bi bi-receipt me-2"></i>Hoá đơn
-                </a>
-                <a class="nav-link sidebar-link {{ request()->routeIs('admin.students*') ? 'active' : '' }}"
-                   href="{{ route('admin.students.index') }}">
-                    <i class="bi bi-mortarboard me-2"></i>Quản lý Sinh viên
                 </a>
                 <a class="nav-link sidebar-link" href="{{ route('home') }}">
                     <i class="bi bi-globe me-2"></i>Xem trang chủ
