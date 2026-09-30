@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RoomTypeController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\InvoiceController;
+use App\Http\Controllers\Admin\StudentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +28,7 @@ Route::get('/rooms/{room}', [HomeController::class, 'show'])->name('rooms.show')
 Route::get('/booking/create', [ClientBookingController::class, 'create'])->name('booking.create');
 Route::post('/booking', [ClientBookingController::class, 'store'])->name('booking.store');
 Route::get('/booking/{booking}/confirmation', [ClientBookingController::class, 'confirmation'])->name('booking.confirmation');
+Route::get('/api/check-student/{code}', [ClientBookingController::class, 'checkStudentCard'])->name('api.check-student');
 
 /*
 |--------------------------------------------------------------------------
@@ -80,4 +82,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,receptionist'])->name('a
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::patch('/invoices/{invoice}/paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
     Route::patch('/invoices/{invoice}/cancel', [InvoiceController::class, 'markCancelled'])->name('invoices.mark-cancelled');
+
+    // ──── Quản lý sinh viên & ưu đãi thẻ sinh viên ────
+    Route::resource('students', StudentController::class);
 });

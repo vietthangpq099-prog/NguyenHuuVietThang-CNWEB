@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Đặt phòng ' . $room->room_number . ' – Radiant Hotel')
 
 @section('content')
@@ -86,6 +86,24 @@
                             </div>
                         </div>
 
+                        {{-- Ưu đãi Thẻ sinh viên --}}
+                        <div class="card border border-primary bg-primary bg-opacity-10 rounded-3 p-3 mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-mortarboard-fill text-primary fs-5 me-2"></i>
+                                <h6 class="fw-bold text-primary mb-0">Bạn là sinh viên? Nhận ngay ưu đãi giảm giá phòng!</h6>
+                            </div>
+                            <p class="text-muted small mb-2">Nhập mã số thẻ sinh viên để hệ thống tự động kiểm tra thời hạn và áp dụng giảm giá trực tiếp.</p>
+                            <div class="input-group">
+                                <input type="text" name="student_code" id="studentCodeInput" class="form-control"
+                                       value="{{ old('student_code') }}"
+                                       placeholder="Ví dụ: SV202401">
+                                <button type="button" class="btn btn-primary" id="btnCheckStudent" onclick="verifyStudentCard()">
+                                    <i class="bi bi-shield-check me-1"></i>Kiểm tra thẻ
+                                </button>
+                            </div>
+                            <div id="studentFeedback" class="mt-2" style="display: none;"></div>
+                        </div>
+
                         {{-- Ghi chú --}}
                         <div class="mb-4">
                             <label class="form-label fw-semibold"><i class="bi bi-chat-left-text me-1"></i>Ghi chú (tuỳ chọn)</label>
@@ -148,9 +166,20 @@
                         <span class="text-muted">Số đêm</span>
                         <span class="fw-semibold" id="nightsDisplay">{{ $nights }} đêm</span>
                     </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tiền phòng gốc</span>
+                        <span class="fw-semibold" id="originalPriceDisplay">{{ number_format($totalPrice, 0, ',', '.') }}đ</span>
+                    </div>
+
+                    {{-- Dòng ưu đãi sinh viên --}}
+                    <div class="d-flex justify-content-between mb-2 text-success" id="studentDiscountRow" style="display: none !important;">
+                        <span><i class="bi bi-mortarboard-fill me-1"></i>Ưu đãi sinh viên (<span id="discountPercentText">0%</span>)</span>
+                        <span class="fw-bold" id="discountAmountDisplay">-0đ</span>
+                    </div>
+
                     <hr>
                     <div class="d-flex justify-content-between">
-                        <span class="fw-bold fs-5">Tổng cộng</span>
+                        <span class="fw-bold fs-5">Tổng thanh toán</span>
                         <span class="fw-bold fs-5" style="color: #e67e22;" id="totalDisplay">
                             {{ number_format($totalPrice, 0, ',', '.') }}đ
                         </span>
@@ -166,25 +195,102 @@
 
 @push('scripts')
 <script>
-// Tự động cập nhật số đêm & tổng tiền khi thay đổi ngày
+// Tự động cập nhật số đêm & tổng tiền khi thay đổi ngày và mã giảm giá sinh viên
 const pricePerNight = {{ $room->effective_price }};
 const checkInEl     = document.getElementById('checkIn');
 const checkOutEl    = document.getElementById('checkOut');
+let currentDiscountPercent = 0;
 
 function updatePrice() {
     const checkIn  = new Date(checkInEl.value);
     const checkOut = new Date(checkOutEl.value);
     if (checkIn && checkOut && checkOut > checkIn) {
         const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-        const total  = pricePerNight * nights;
+        const originalTotal = pricePerNight * nights;
+        const discountAmount = Math.round(originalTotal * (currentDiscountPercent / 100));
+        const finalTotal = Math.max(0, originalTotal - discountAmount);
+
         document.getElementById('nightsDisplay').textContent = nights + ' đêm';
-        document.getElementById('totalDisplay').textContent =
-            total.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('originalPriceDisplay').textContent = originalTotal.toLocaleString('vi-VN') + 'đ';
+
+        const discountRow = document.getElementById('studentDiscountRow');
+        if (currentDiscountPercent > 0) {
+            discountRow.style.setProperty('display', 'flex', 'important');
+            document.getElementById('discountPercentText').textContent = currentDiscountPercent + '%';
+            document.getElementById('discountAmountDisplay').textContent = '-' + discountAmount.toLocaleString('vi-VN') + 'đ';
+        } else {
+            discountRow.style.setProperty('display', 'none', 'important');
+        }
+
+        document.getElementById('totalDisplay').textContent = finalTotal.toLocaleString('vi-VN') + 'đ';
     }
 }
 
+function verifyStudentCard() {
+    const codeInput = document.getElementById('studentCodeInput');
+    const feedback = document.getElementById('studentFeedback');
+    const btn = document.getElementById('btnCheckStudent');
+    const code = codeInput.value.trim();
+
+    if (!code) {
+        feedback.style.display = 'block';
+        feedback.innerHTML = '<div class="alert alert-warning py-2 px-3 small mb-0"><i class="bi bi-exclamation-circle me-1"></i>Vui lòng nhập mã số thẻ sinh viên.</div>';
+        currentDiscountPercent = 0;
+        updatePrice();
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang kiểm tra...';
+    feedback.style.display = 'none';
+
+    fetch('{{ url("/api/check-student") }}/' + encodeURIComponent(code))
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(result => {
+            feedback.style.display = 'block';
+            if (result.status === 200 && result.body.valid) {
+                currentDiscountPercent = result.body.discount_percent;
+                feedback.innerHTML = `
+                    <div class="alert alert-success py-2 px-3 small mb-0 border-success">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        <strong>Thẻ hợp lệ!</strong> Sinh viên: <b>${result.body.name}</b> (${result.body.university})<br>
+                        Hạn thẻ: <span class="badge bg-success">${result.body.expiry_date}</span> — Áp dụng giảm giá <b>${result.body.discount_percent}%</b>!
+                    </div>
+                `;
+            } else if (result.status === 422) {
+                // Thẻ đã hết hạn
+                currentDiscountPercent = 0;
+                feedback.innerHTML = `
+                    <div class="alert alert-danger py-2 px-3 small mb-0 border-danger">
+                        <i class="bi bi-x-circle-fill me-1"></i>
+                        <strong>Thẻ hết hạn!</strong> ${result.body.message}
+                    </div>
+                `;
+            } else {
+                // Không tìm thấy
+                currentDiscountPercent = 0;
+                feedback.innerHTML = `
+                    <div class="alert alert-danger py-2 px-3 small mb-0 border-danger">
+                        <i class="bi bi-question-circle-fill me-1"></i>
+                        ${result.body.message || 'Mã thẻ không tồn tại.'}
+                    </div>
+                `;
+            }
+            updatePrice();
+        })
+        .catch(err => {
+            feedback.style.display = 'block';
+            feedback.innerHTML = '<div class="alert alert-danger py-2 px-3 small mb-0">Lỗi kết nối máy chủ khi kiểm tra thẻ.</div>';
+            currentDiscountPercent = 0;
+            updatePrice();
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-shield-check me-1"></i>Kiểm tra thẻ';
+        });
+}
+
 checkInEl.addEventListener('change', function() {
-    // Đặt min cho ngày trả = ngày nhận + 1
     const next = new Date(this.value);
     next.setDate(next.getDate() + 1);
     checkOutEl.min = next.toISOString().split('T')[0];
@@ -195,5 +301,13 @@ checkInEl.addEventListener('change', function() {
 });
 
 checkOutEl.addEventListener('change', updatePrice);
+
+// Tự động kiểm tra thẻ nếu người dùng nhập sẵn từ trước
+document.getElementById('studentCodeInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        verifyStudentCard();
+    }
+});
 </script>
 @endpush

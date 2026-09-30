@@ -230,9 +230,10 @@
             <div class="card-body p-4">
                 @php
                     $nights       = $booking->nights;
-                    $roomTotal    = $booking->room->effective_price * $nights;
+                    $roomTotal    = $booking->original_price ?? ($booking->room->effective_price * $nights);
+                    $discountVal  = $booking->discount_amount ?? 0;
                     $serviceTotal = $booking->services->sum('pivot.total_price');
-                    $subtotal     = $roomTotal + $serviceTotal;
+                    $subtotal     = max(0, $roomTotal - $discountVal) + $serviceTotal;
                     $tax          = round($subtotal * 0.1);
                     $grandTotal   = $subtotal + $tax;
                 @endphp
@@ -241,6 +242,13 @@
                     <span class="text-muted">Tiền phòng ({{ $nights }} đêm)</span>
                     <span class="fw-semibold">{{ number_format($roomTotal, 0, ',', '.') }}đ</span>
                 </div>
+
+                @if($discountVal > 0)
+                <div class="d-flex justify-content-between mb-2 text-success">
+                    <span><i class="bi bi-mortarboard-fill me-1"></i>Ưu đãi sinh viên ({{ $booking->student_code }})</span>
+                    <span class="fw-bold">-{{ number_format($discountVal, 0, ',', '.') }}đ</span>
+                </div>
+                @endif
 
                 @if($serviceTotal > 0)
                 <div class="d-flex justify-content-between mb-2">

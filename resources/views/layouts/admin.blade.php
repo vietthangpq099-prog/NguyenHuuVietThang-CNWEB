@@ -50,6 +50,10 @@
                    href="{{ route('admin.invoices.index') }}">
                     <i class="bi bi-receipt me-2"></i>Hoá đơn
                 </a>
+                <a class="nav-link sidebar-link {{ request()->routeIs('admin.students*') ? 'active' : '' }}"
+                   href="{{ route('admin.students.index') }}">
+                    <i class="bi bi-mortarboard me-2"></i>Quản lý Sinh viên
+                </a>
                 <a class="nav-link sidebar-link" href="{{ route('home') }}">
                     <i class="bi bi-globe me-2"></i>Xem trang chủ
                 </a>

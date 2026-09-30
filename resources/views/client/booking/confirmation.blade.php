@@ -137,10 +137,25 @@
                     </div>
                     @endif
 
+                    @if($booking->discount_amount > 0)
+                    <div class="alert alert-success d-flex align-items-center mb-3 py-2 px-3 rounded-3 border-success">
+                        <i class="bi bi-mortarboard-fill fs-4 me-2 text-success"></i>
+                        <div class="small">
+                            <strong>Đã áp dụng ưu đãi sinh viên!</strong><br>
+                            Mã thẻ SV: <span class="badge bg-success">{{ $booking->student_code }}</span>
+                            @if($booking->student)
+                                — <b>{{ $booking->student->name }}</b> ({{ $booking->student->university }})
+                            @endif
+                            <br>Giảm: <strong class="text-danger">-{{ number_format($booking->discount_amount, 0, ',', '.') }}đ</strong> 
+                            (Giá gốc: {{ number_format($booking->original_price, 0, ',', '.') }}đ)
+                        </div>
+                    </div>
+                    @endif
+
                     {{-- Tổng tiền --}}
                     <div class="p-3 rounded-3" style="background: #fef9e7; border: 1px solid #f9e79f;">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="fw-bold text-dark">Tổng tiền phòng:</span>
+                            <span class="fw-bold text-dark">Tổng tiền phòng thanh toán:</span>
                             <span class="fw-bold fs-4 text-danger">{{ number_format($booking->total_price, 0, ',', '.') }}đ</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center small text-muted">

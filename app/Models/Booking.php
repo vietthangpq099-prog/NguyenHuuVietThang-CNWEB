@@ -15,6 +15,8 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'room_id',
+        'student_id',
+        'student_code',
         'guest_name',
         'guest_phone',
         'guest_email',
@@ -24,6 +26,8 @@ class Booking extends Model
         'status',
         'payment_status',
         'total_price',
+        'original_price',
+        'discount_amount',
         'notes',
     ];
 
@@ -46,9 +50,17 @@ class Booking extends Model
     /**
      * Đặt phòng thuộc một phòng.
      */
-    public function room(): BelongsTo
+     public function room(): BelongsTo
+     {
+         return $this->belongsTo(Room::class);
+     }
+
+    /**
+     * Đặt phòng có thể gắn với một sinh viên ưu đãi (nullable).
+     */
+    public function student(): BelongsTo
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(Student::class);
     }
 
     /**
