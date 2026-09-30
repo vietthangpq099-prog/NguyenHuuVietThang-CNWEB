@@ -90,17 +90,46 @@
                         <div class="card border border-primary bg-primary bg-opacity-10 rounded-3 p-3 mb-4">
                             <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-mortarboard-fill text-primary fs-5 me-2"></i>
-                                <h6 class="fw-bold text-primary mb-0">Bạn là sinh viên? Nhận ngay ưu đãi giảm giá phòng!</h6>
+                                <h6 class="fw-bold text-primary mb-0">Bạn là sinh viên? Nhận ngay ưu đãi giảm 15% tiền phòng!</h6>
                             </div>
-                            <p class="text-muted small mb-2">Nhập mã số thẻ sinh viên để hệ thống tự động kiểm tra thời hạn và áp dụng giảm giá trực tiếp.</p>
-                            <div class="input-group">
-                                <input type="text" name="student_code" id="studentCodeInput" class="form-control"
-                                       value="{{ old('student_code') }}"
-                                       placeholder="Ví dụ: SV202401">
-                                <button type="button" class="btn btn-primary" id="btnCheckStudent" onclick="verifyStudentCard()">
-                                    <i class="bi bi-shield-check me-1"></i>Kiểm tra thẻ
-                                </button>
+                            <p class="text-muted small mb-3">Chọn trường và nhập mã sinh viên (MSSV) để hệ thống tự động nhận diện khóa học, kiểm tra hạn thẻ và kích hoạt giảm giá.</p>
+                            
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6 col-12">
+                                    <label class="form-label small fw-semibold text-dark mb-1">
+                                        <i class="bi bi-building me-1 text-primary"></i>Trường Đại học / Cao đẳng
+                                    </label>
+                                    <select name="university" id="universitySelect" class="form-select form-select-sm">
+                                        <option value="ĐH Khoa học Tự nhiên (HCMUS)">ĐH Khoa học Tự nhiên TP.HCM (HCMUS)</option>
+                                        <option value="ĐH Bách Khoa TP.HCM (HCMUT)">ĐH Bách Khoa TP.HCM (HCMUT)</option>
+                                        <option value="ĐH Công nghệ Thông tin (UIT)">ĐH Công nghệ Thông tin (UIT)</option>
+                                        <option value="ĐH Kinh tế TP.HCM (UEH)">ĐH Kinh tế TP.HCM (UEH)</option>
+                                        <option value="ĐH Sư phạm Kỹ thuật (HCMUTE)">ĐH Sư phạm Kỹ thuật (HCMUTE)</option>
+                                        <option value="ĐH Quốc tế (IU)">ĐH Quốc tế (IU)</option>
+                                        <option value="ĐH FPT">ĐH FPT</option>
+                                        <option value="ĐH Giao thông Vận tải">ĐH Giao thông Vận tải</option>
+                                        <option value="ĐH Ngoại thương (FTU)">ĐH Ngoại thương (FTU)</option>
+                                        <option value="ĐH Tôn Đức Thắng (TDTU)">ĐH Tôn Đức Thắng (TDTU)</option>
+                                        <option value="Trường Đại học / Cao đẳng khác">Trường Đại học / Cao đẳng khác</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-12">
+                                    <label class="form-label small fw-semibold text-dark mb-1">
+                                        <i class="bi bi-person-badge me-1 text-primary"></i>Mã số sinh viên (MSSV)
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" name="student_code" id="studentCodeInput" class="form-control"
+                                               value="{{ old('student_code') }}"
+                                               placeholder="Ví dụ: 2451220102">
+                                        <button type="button" class="btn btn-primary" id="btnCheckStudent" onclick="verifyStudentCard()">
+                                            <i class="bi bi-shield-check me-1"></i>Kiểm tra thẻ
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                            <small class="text-muted fst-italic" style="font-size: 0.8rem;">
+                                💡 Mẹo: Hệ thống tự động tính hạn thẻ theo 2 số đầu MSSV (VD: <strong>24...</strong> là K24 tốt nghiệp 2028).
+                            </small>
                             <div id="studentFeedback" class="mt-2" style="display: none;"></div>
                         </div>
 
@@ -228,9 +257,11 @@ function updatePrice() {
 
 function verifyStudentCard() {
     const codeInput = document.getElementById('studentCodeInput');
+    const uniSelect = document.getElementById('universitySelect');
     const feedback = document.getElementById('studentFeedback');
     const btn = document.getElementById('btnCheckStudent');
     const code = codeInput.value.trim();
+    const uni  = uniSelect.value;
 
     if (!code) {
         feedback.style.display = 'block';
@@ -244,17 +275,19 @@ function verifyStudentCard() {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang kiểm tra...';
     feedback.style.display = 'none';
 
-    fetch('{{ url("/api/check-student") }}/' + encodeURIComponent(code))
+    fetch('{{ url("/api/check-student") }}/' + encodeURIComponent(code) + '?university=' + encodeURIComponent(uni))
         .then(response => response.json().then(data => ({ status: response.status, body: data })))
         .then(result => {
             feedback.style.display = 'block';
             if (result.status === 200 && result.body.valid) {
                 currentDiscountPercent = result.body.discount_percent;
+                const studentTitle = result.body.name ? `Sinh viên: <b>${result.body.name}</b>` : `MSSV: <b>${result.body.student_code}</b>`;
+                const cohortInfo = result.body.cohort ? `<span class="badge bg-primary me-1">${result.body.cohort}</span>` : '';
                 feedback.innerHTML = `
                     <div class="alert alert-success py-2 px-3 small mb-0 border-success">
                         <i class="bi bi-check-circle-fill me-1"></i>
-                        <strong>Thẻ hợp lệ!</strong> Sinh viên: <b>${result.body.name}</b> (${result.body.university})<br>
-                        Hạn thẻ: <span class="badge bg-success">${result.body.expiry_date}</span> — Áp dụng giảm giá <b>${result.body.discount_percent}%</b>!
+                        <strong>Thẻ hợp lệ!</strong> ${studentTitle} (${result.body.university})<br>
+                        ${cohortInfo}Hạn thẻ: <span class="badge bg-success">${result.body.expiry_date}</span> — Áp dụng giảm giá <b>${result.body.discount_percent}%</b>!
                     </div>
                 `;
             } else if (result.status === 422) {
@@ -267,12 +300,12 @@ function verifyStudentCard() {
                     </div>
                 `;
             } else {
-                // Không tìm thấy
+                // Không tìm thấy hoặc sai định dạng
                 currentDiscountPercent = 0;
                 feedback.innerHTML = `
                     <div class="alert alert-danger py-2 px-3 small mb-0 border-danger">
                         <i class="bi bi-question-circle-fill me-1"></i>
-                        ${result.body.message || 'Mã thẻ không tồn tại.'}
+                        ${result.body.message || 'Mã thẻ không hợp lệ.'}
                     </div>
                 `;
             }
